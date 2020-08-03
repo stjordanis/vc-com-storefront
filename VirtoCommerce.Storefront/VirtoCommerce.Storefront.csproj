@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <UserSecretsId>0cd403c4-2cd0-42b3-987a-02900f4a683e</UserSecretsId>
+    <Company>Virto Commerce</Company>
+    <Authors>Virto Commerce</Authors>
+    <Description>The storefront implementation of the Virto Commerce platform.</Description>
+    <PackageLicenseUrl>https://virtocommerce.com/open-source-license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/VirtoCommerce/vc-storefront-core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/VirtoCommerce/vc-storefront-core</RepositoryUrl>
+    <AssemblyVersion>4.1.14.0</AssemblyVersion>
+    <FileVersion>4.1.14.0</FileVersion>
+    <Version>4.1.14</Version>
+    <Copyright>Copyright © 2011-2020 Virto Commerce - an enterprise Microsoft ecommerce platform ©. All rights reserved</Copyright>
+    <PackageIconUrl>https://virtocommerce.com/themes/assets/logo.jpg</PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <!--Remove later when Azure apps has been updated-->
+    <!--<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>-->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1591;1573;1570</NoWarn>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="wwwroot\cms-content\**" />
+    <Content Remove="wwwroot\cms-content\**" />
+    <Content Update="wwwroot\cms-content\**" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="IISUrlRewrite.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.2.0" />
+    <PackageReference Include="AspNet.Security.OAuth.StackExchange" Version="2.2.0" />
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
+    <PackageReference Include="IdentityModel" Version="4.1.1" />
+    <PackageReference Include="Markdig" Version="0.18.3" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.SnapshotCollector" Version="1.3.6" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Web" Version="2.13.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AutoRest.Common" Version="2.4.48" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="2.2.5" />
+    <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.21" />
+    <PackageReference Include="Microsoft.SyndicationFeed.ReaderWriter" Version="1.0.2" />
+    <PackageReference Include="MimeTypes" Version="1.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Nito.AsyncEx" Version="5.0.0" />
+    <PackageReference Include="PagedList.Core" Version="1.17.4" />
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="Scrutor" Version="3.2.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
+    <PackageReference Include="VirtoCommerce.Tools" Version="1.2.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VirtoCommerce.LiquidThemeEngine\VirtoCommerce.LiquidThemeEngine.csproj" />
+    <ProjectReference Include="..\VirtoCommerce.Storefront.Model\VirtoCommerce.Storefront.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+</Project>
