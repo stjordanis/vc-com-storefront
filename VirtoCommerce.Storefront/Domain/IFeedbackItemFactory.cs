@@ -4,7 +4,7 @@ namespace VirtoCommerce.Storefront.Domain
 {
     public interface IFeedbackItemFactory
     {
-        void CreateItem(string name);
-        FeedbackItem this[string name] { get; }
+        void CreateItems();
+        FeedbackItem GetItem(string name);
     }
 }

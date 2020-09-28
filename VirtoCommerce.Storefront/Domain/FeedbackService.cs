@@ -9,19 +9,12 @@ namespace VirtoCommerce.Storefront.Domain
         public FeedbackService(IFeedbackItemFactory factory)
         {
             _factory = factory;
-            Init();
-        }
-
-        private void Init()
-        {
-            _factory.CreateItem("TargetAccountV2");
-            _factory.CreateItem("Location");
-            _factory.CreateItem("GatedAssets");
+            _factory.CreateItems();
         }
 
         public FeedbackItem GetItem(string name)
         {
-            return _factory[name];
+            return _factory.GetItem(name);
         }
     }
 }

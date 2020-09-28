@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using VirtoCommerce.Storefront.Infrastructure;
 using VirtoCommerce.Storefront.Model.Feedback;
 
@@ -16,26 +19,43 @@ namespace VirtoCommerce.Storefront.Controllers
             _feedbackService = feedbackService;
         }
 
-        [HttpPost("targetAccountV2")]
-        public IActionResult TargetAccountV2(string companyName, string email)
+        [HttpPost("call")]
+        public async Task<IActionResult> CallService(Dictionary<string, string> data)
         {
-            Task.Run(() => _feedbackService.GetItem("TargetAccountV2").SendRequest($"CompanyName={companyName}", $"Email={email}"));
-            return Ok();
+            var name = Request.Headers["service"];
+            if (!string.IsNullOrEmpty(name))
+            {
+                var parameters = data?.Select(p => $"{p.Key}={data[p.Key]}").ToList();
+                var serviceResponse = await _feedbackService.GetItem(name).SendRequestAsync(parameters);
+                var statusCode = (int)serviceResponse.StatusCode;
+                if (statusCode == 200)
+                {
+                    if (TryParseJson(serviceResponse.Content, out var content))
+                    {
+                        return Json(content);
+                    }
+                    return Ok(serviceResponse.Content);
+                }
+                else
+                {
+                    return new StatusCodeResult(statusCode);
+                }
+            }
+            return NotFound();
         }
 
-
-        [HttpPost("location")]
-        public IActionResult Location(string ip, string email)
+        private bool TryParseJson(string json, out object result)
         {
-            Task.Run(() => _feedbackService.GetItem("Location").SendRequest($"ip={ip}", $"Email={email}"));
-            return Ok();
-        }
-
-        [HttpPost("gatedAssets")]
-        public IActionResult GatedAssets(string assetId, string email)
-        {
-            Task.Run(() => _feedbackService.GetItem("GatedAssets").SendRequest($"assetId={assetId}", $"Email={email}"));
-            return Ok();
+            try
+            {
+                result = JsonConvert.DeserializeObject(json);
+                return true;
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
         }
     }
 }
