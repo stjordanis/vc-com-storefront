@@ -28,21 +28,23 @@ namespace VirtoCommerce.Storefront.Model.Feedback
         public async Task<(HttpStatusCode StatusCode, string Content)> SendRequestAsync(IEnumerable<string> parameters)
         {
             var requestParams = string.Join('&', AllowAdditionalParams ? Parameters.Concat(parameters) : Parameters);
-            var client = new HttpClient();
-            var bytes = Encoding.Default.GetBytes(requestParams);
-
-            using (var stream = new MemoryStream())
+            using (var client = new HttpClient())
             {
-                stream.Write(bytes, 0, bytes.Length);
-                var requestMessage = new HttpRequestMessage()
+                var bytes = Encoding.Default.GetBytes(requestParams);
+
+                using (var stream = new MemoryStream())
                 {
-                    Method = new HttpMethod(HttpMethod ?? "GET"),
-                    RequestUri = new Uri(Url + (Url.Contains('?') ? '&' : '?') + requestParams),
-                    Content = new StreamContent(stream)
-                };
-                var responseMessage = await client.SendAsync(requestMessage);
-                var content = await requestMessage.Content.ReadAsStringAsync();
-                return (responseMessage.StatusCode, content);
+                    stream.Write(bytes, 0, bytes.Length);
+                    var requestMessage = new HttpRequestMessage()
+                    {
+                        Method = new HttpMethod(HttpMethod ?? "GET"),
+                        RequestUri = new Uri(Url + (Url.Contains('?') ? '&' : '?') + requestParams),
+                        Content = new StreamContent(stream)
+                    };
+                    var responseMessage = await client.SendAsync(requestMessage);
+                    var content = await requestMessage.Content.ReadAsStringAsync();
+                    return (responseMessage.StatusCode, content);
+                }
             }
         }
     }
