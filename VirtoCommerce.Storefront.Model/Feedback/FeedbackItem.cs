@@ -22,5 +22,16 @@ namespace VirtoCommerce.Storefront.Model.Feedback
             get => AllowAdditionalParams ? _parameters.Concat(AdditionalParams).ToList() : _parameters;
             set => _parameters = value;
         }
+
+        public FeedbackItem Clone()
+        {
+            return new FeedbackItem(Url)
+            {
+                HttpMethod = HttpMethod,
+                AllowAdditionalParams = AllowAdditionalParams,
+                AdditionalParams = new List<string>(AdditionalParams),
+                Parameters = new List<string>(_parameters)
+            };
+        }
     }
 }

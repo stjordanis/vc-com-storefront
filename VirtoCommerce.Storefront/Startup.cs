@@ -126,9 +126,8 @@ namespace VirtoCommerce.Storefront
             services.AddTransient<ICartService, CartService>();
             services.AddTransient<AngularAntiforgeryCookieResultFilter>();
             services.AddTransient<AnonymousUserForStoreAuthorizationFilter>();
-            services.AddSingleton<IFeedbackService, FeedbackService>();
-            services.AddSingleton<IFeedbackItemFactory, FeedbackItemFactory>();
-            services.AddSingleton<IFeedbackItemSending<FeedbackItem, (HttpStatusCode StatusCode, string Content)>, FeedbackItemHttpSending>();
+            services.AddSingleton<IFeedbackItemFactory, FeedbackItemFactory>(provider => new FeedbackItemFactory(Configuration.GetSection("FeedbackServices")));
+            services.AddSingleton<IFeedbackItemService<FeedbackItem, (HttpStatusCode StatusCode, string Content)>, HttpFeedbackItemService>();
 
             //Register events framework dependencies
             services.AddSingleton(new InProcessBus());

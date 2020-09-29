@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VirtoCommerce.Storefront.Model.Feedback
 {
-    public class FeedbackItemHttpSending : IFeedbackItemSending<FeedbackItem, (HttpStatusCode StatusCode, string Content)>
+    public class HttpFeedbackItemService : IFeedbackItemService<FeedbackItem, (HttpStatusCode StatusCode, string Content)>
     {
         public async Task<(HttpStatusCode StatusCode, string Content)> SendAsync(FeedbackItem item)
         {

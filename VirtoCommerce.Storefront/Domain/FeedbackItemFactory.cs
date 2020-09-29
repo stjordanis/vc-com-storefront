@@ -7,20 +7,15 @@ namespace VirtoCommerce.Storefront.Domain
 {
     public class FeedbackItemFactory : IFeedbackItemFactory
     {
-        private readonly IConfiguration _configuration;
-
-        public FeedbackItemFactory(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public FeedbackItemFactory(IConfigurationSection section) => Config(section);
 
         private readonly Dictionary<string, FeedbackItem> _items = new Dictionary<string, FeedbackItem>();
 
-        public FeedbackItem GetItem(string name) => _items[name];
+        public FeedbackItem GetItem(string name) => _items[name].Clone();
 
-        public void CreateItems()
+        public void Config(IConfigurationSection configuration)
         {
-            var services = _configuration.GetSection("FeedbackServices").GetChildren();
+            var services = configuration.GetChildren();
             foreach (var service in services)
             {
                 var url = service.GetSection("Url");
