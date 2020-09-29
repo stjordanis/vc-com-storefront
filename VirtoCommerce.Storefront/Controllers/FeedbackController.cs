@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -13,10 +14,12 @@ namespace VirtoCommerce.Storefront.Controllers
     public class FeedbackController : Controller
     {
         private readonly IFeedbackService _feedbackService;
+        private readonly IFeedbackItemSending<FeedbackItem, (HttpStatusCode StatusCode, string Content)> _feedbackItemSending;
 
-        public FeedbackController(IFeedbackService feedbackService)
+        public FeedbackController(IFeedbackService feedbackService, IFeedbackItemSending<FeedbackItem, (HttpStatusCode StatusCode, string Content)> feedbackItemSending)
         {
             _feedbackService = feedbackService;
+            _feedbackItemSending = feedbackItemSending;
         }
 
         [HttpPost("call")]
@@ -25,8 +28,9 @@ namespace VirtoCommerce.Storefront.Controllers
             var name = Request.Headers["service"];
             if (!string.IsNullOrEmpty(name))
             {
-                var parameters = data?.Select(p => $"{p.Key}={data[p.Key]}").ToList();
-                var serviceResponse = await _feedbackService.GetItem(name).SendRequestAsync(parameters);
+                var item = _feedbackService.GetItem(name);
+                item.AdditionalParams = data?.Select(p => $"{p.Key}={data[p.Key]}").ToList();
+                var serviceResponse = await _feedbackItemSending.SendAsync(item);
                 var statusCode = (int)serviceResponse.StatusCode;
                 if (statusCode == 200)
                 {

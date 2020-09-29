@@ -1,21 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VirtoCommerce.Storefront.Model.Feedback
 {
     public class FeedbackItem
     {
-        public FeedbackItem(string url)
-        {
-            Url = url;
-            Parameters = new List<string>();
-        }
+        public FeedbackItem(string url) => Url = url;
 
         public string Url { get; }
 
@@ -23,29 +13,14 @@ namespace VirtoCommerce.Storefront.Model.Feedback
 
         public bool AllowAdditionalParams { get; set; }
 
-        public List<string> Parameters { get; set; }
+        public List<string> AdditionalParams { get; set; } = new List<string>();
 
-        public async Task<(HttpStatusCode StatusCode, string Content)> SendRequestAsync(IEnumerable<string> parameters)
+        private List<string> _parameters = new List<string>();
+
+        public List<string> Parameters
         {
-            var requestParams = string.Join('&', AllowAdditionalParams ? Parameters.Concat(parameters) : Parameters);
-            using (var client = new HttpClient())
-            {
-                var bytes = Encoding.Default.GetBytes(requestParams);
-
-                using (var stream = new MemoryStream())
-                {
-                    stream.Write(bytes, 0, bytes.Length);
-                    var requestMessage = new HttpRequestMessage()
-                    {
-                        Method = new HttpMethod(HttpMethod ?? "GET"),
-                        RequestUri = new Uri(Url + (Url.Contains('?') ? '&' : '?') + requestParams),
-                        Content = new StreamContent(stream)
-                    };
-                    var responseMessage = await client.SendAsync(requestMessage);
-                    var content = await requestMessage.Content.ReadAsStringAsync();
-                    return (responseMessage.StatusCode, content);
-                }
-            }
+            get => AllowAdditionalParams ? _parameters.Concat(AdditionalParams).ToList() : _parameters;
+            set => _parameters = value;
         }
     }
 }
