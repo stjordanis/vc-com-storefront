@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using VirtoCommerce.Storefront.Domain;
 using VirtoCommerce.Storefront.Infrastructure;
 using VirtoCommerce.Storefront.Model.Feedback;
 
@@ -9,33 +14,53 @@ namespace VirtoCommerce.Storefront.Controllers
     [ValidateAntiForgeryToken]
     public class FeedbackController : Controller
     {
-        private readonly IFeedbackService _feedbackService;
+        private readonly IFeedbackItemFactory _feedbackItemFactory;
+        private readonly IFeedbackItemService<FeedbackItem, (HttpStatusCode StatusCode, string Content)> _feedbackItemService;
 
-        public FeedbackController(IFeedbackService feedbackService)
+        public FeedbackController(IFeedbackItemFactory feedbackItemFactory, IFeedbackItemService<FeedbackItem, (HttpStatusCode StatusCode, string Content)> feedbackItemService)
         {
-            _feedbackService = feedbackService;
+            _feedbackItemFactory = feedbackItemFactory;
+            _feedbackItemService = feedbackItemService;
         }
 
-        [HttpPost("targetAccountV2")]
-        public IActionResult TargetAccountV2(string companyName, string email)
+        [HttpPost("call")]
+        public async Task<IActionResult> CallService(Dictionary<string, string> data)
         {
-            Task.Run(() => _feedbackService.GetItem("TargetAccountV2").SendRequest($"CompanyName={companyName}", $"Email={email}"));
-            return Ok();
+            var name = Request.Headers["service"];
+            if (!string.IsNullOrEmpty(name))
+            {
+                var item = _feedbackItemFactory.GetItem(name);
+                item.AdditionalParams = data?.Select(p => $"{p.Key}={data[p.Key]}").ToList();
+                var serviceResponse = await _feedbackItemService.SendAsync(item);
+                var statusCode = (int)serviceResponse.StatusCode;
+                if (statusCode == 200)
+                {
+                    if (TryParseJson(serviceResponse.Content, out var content))
+                    {
+                        return Json(content);
+                    }
+                    return Ok(serviceResponse.Content);
+                }
+                else
+                {
+                    return new StatusCodeResult(statusCode);
+                }
+            }
+            return NotFound();
         }
 
-
-        [HttpPost("location")]
-        public IActionResult Location(string ip, string email)
+        private bool TryParseJson(string json, out object result)
         {
-            Task.Run(() => _feedbackService.GetItem("Location").SendRequest($"ip={ip}", $"Email={email}"));
-            return Ok();
-        }
-
-        [HttpPost("gatedAssets")]
-        public IActionResult GatedAssets(string assetId, string email)
-        {
-            Task.Run(() => _feedbackService.GetItem("GatedAssets").SendRequest($"assetId={assetId}", $"Email={email}"));
-            return Ok();
+            try
+            {
+                result = JsonConvert.DeserializeObject(json);
+                return true;
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
         }
     }
 }

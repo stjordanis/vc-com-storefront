@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using FluentValidation.AspNetCore;
@@ -125,8 +126,8 @@ namespace VirtoCommerce.Storefront
             services.AddTransient<ICartService, CartService>();
             services.AddTransient<AngularAntiforgeryCookieResultFilter>();
             services.AddTransient<AnonymousUserForStoreAuthorizationFilter>();
-            services.AddSingleton<IFeedbackService, FeedbackService>();
-            services.AddSingleton<IFeedbackItemFactory, FeedbackItemFactory>();
+            services.AddSingleton<IFeedbackItemFactory, FeedbackItemFactory>(provider => new FeedbackItemFactory(Configuration.GetSection("FeedbackServices")));
+            services.AddSingleton<IFeedbackItemService<FeedbackItem, (HttpStatusCode StatusCode, string Content)>, HttpFeedbackItemService>();
 
             //Register events framework dependencies
             services.AddSingleton(new InProcessBus());
