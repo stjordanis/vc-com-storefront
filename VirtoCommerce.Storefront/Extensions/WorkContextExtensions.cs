@@ -1,4 +1,8 @@
+using System;
+using System.IO;
+using System.Linq;
 using VirtoCommerce.Storefront.Model;
+using VirtoCommerce.Storefront.Model.Common;
 using VirtoCommerce.Storefront.Model.StaticContent;
 
 namespace VirtoCommerce.Storefront.Extensions
@@ -16,6 +20,14 @@ namespace VirtoCommerce.Storefront.Extensions
                 Title = page.Title,
                 Slug = page.Permalink
             };
+        }
+
+        public static ContentPage FindContentPageByName(this WorkContext context, string name)
+        {
+            return context.Pages
+                .OfType<ContentPage>()
+                .Where(x => string.Equals(x.Url, name, StringComparison.OrdinalIgnoreCase) && Path.GetExtension(x.FileName) == ".page")
+                .FindWithLanguage(context.CurrentLanguage);
         }
     }
 }

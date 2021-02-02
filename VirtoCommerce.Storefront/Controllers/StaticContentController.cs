@@ -128,6 +128,13 @@ namespace VirtoCommerce.Storefront.Controllers
                     Slug = context.RequestUrl.AbsolutePath
                 };
                 WorkContext.Layout = WorkContext.CurrentBlog.Layout;
+
+                var contentPage = WorkContext.FindContentPageByName("blog");
+                if (contentPage != null)
+                {
+                    WorkContext.SetCurrentPage(contentPage);
+                    return View(contentPage.Template, WorkContext);
+                }
                 return View("blog", WorkContext);
             }
             return NotFound();
