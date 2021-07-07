@@ -465,6 +465,29 @@ namespace VirtoCommerce.Storefront
             app.Use(async (context, next) =>
             {
                 context.Response.Headers["X-Xss-Protection"] = "1";
+                if (context.Request.Path.Value.Contains("designer-preview"))
+                {
+                    var endPointUrl = Configuration.GetSection("VirtoCommerce:EndPoint:Url");
+                    if (endPointUrl != null)
+                    {
+                        context.Response.Headers["Content-Security-Policy"] = $"frame-src {endPointUrl.Value};";
+                    }
+                }
+                else
+                {
+                    var contentSecurityPolicyDirectives = Configuration.GetSection("ContentSecurityPolicy").GetChildren();
+                    if (contentSecurityPolicyDirectives != null)
+                    {
+                        var cspHeaderBuilder = new StringBuilder();
+                        foreach (var directive in contentSecurityPolicyDirectives)
+                        {
+                            cspHeaderBuilder.Append($"{directive.Key} {directive.Value};");
+                        }
+                        context.Response.Headers["Content-Security-Policy"] = cspHeaderBuilder.ToString();
+                    }
+                    context.Response.Headers["X-Frame-Options"] = "DENY";
+                }
+                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
                 await next();
             });
             app.UseMvc(routes =>
