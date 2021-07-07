@@ -478,12 +478,12 @@ namespace VirtoCommerce.Storefront
                     var contentSecurityPolicyDirectives = Configuration.GetSection("ContentSecurityPolicy").GetChildren();
                     if (contentSecurityPolicyDirectives != null)
                     {
-                        var cspHeader = string.Empty;
+                        var cspHeaderBuilder = new StringBuilder();
                         foreach (var directive in contentSecurityPolicyDirectives)
                         {
-                            cspHeader += $"{directive.Key} {directive.Value};";
+                            cspHeaderBuilder.Append($"{directive.Key} {directive.Value};");
                         }
-                        context.Response.Headers["Content-Security-Policy"] = cspHeader;
+                        context.Response.Headers["Content-Security-Policy"] = cspHeaderBuilder.ToString();
                     }
                     context.Response.Headers["X-Frame-Options"] = "DENY";
                 }
