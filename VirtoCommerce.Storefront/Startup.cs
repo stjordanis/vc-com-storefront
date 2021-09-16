@@ -423,6 +423,7 @@ namespace VirtoCommerce.Storefront
             app.UseMiddleware<NoLiquidThemeMiddleware>();
             app.UseMiddleware<CreateStorefrontRolesMiddleware>();
             app.UseMiddleware<ApiErrorHandlingMiddleware>();
+            app.UseMiddleware<UrlReplaceMiddleware>();
 
             var mvcJsonOptions = app.ApplicationServices.GetService<IOptions<MvcJsonOptions>>().Value;
             mvcJsonOptions.SerializerSettings.Converters.Add(new CartTypesJsonConverter(app.ApplicationServices.GetService<IWorkContextAccessor>()));
